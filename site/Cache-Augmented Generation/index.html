@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../img/favicon.ico">
+        <title>Cache-Augmented Generation (CAG) in LLMs: A Step-by-Step Tutorial - My Company Documentation Site</title>
+        <link href="../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../css/brands.min.css" rel="stylesheet">
+        <link href="../css/solid.min.css" rel="stylesheet">
+        <link href="../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="..">My Company Documentation Site</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../docs/index.md" class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Chapter 1</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../docs/Chapter_1.md" class="dropdown-item">Overview</a>
+</li>
+                                    
+<li>
+    <a href="../docs/Chapter_1.1.md" class="dropdown-item">Chapter 1.1</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#cache-augmented-generation-cag-in-llms-a-step-by-step-tutorial" class="nav-link">Cache-Augmented Generation (CAG) in LLMs: A Step-by-Step Tutorial</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#prerequisites" class="nav-link">Prerequisites</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#project-setup" class="nav-link">Project Setup</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#generate-function" class="nav-link">Generate Function</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#dynamiccache-setup" class="nav-link">DynamicCache Setup</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#load-llm-mistral" class="nav-link">Load LLM (Mistral)</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#create-a-knowledge-prompt-from-documenttxt" class="nav-link">Create a Knowledge Prompt from document.txt</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#ask-questions-reusing-the-cache" class="nav-link">Ask Questions Reusing the Cache</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#make-sure-to-leave-the-original-repo-a-star" class="nav-link">Make sure to leave the ORIGINAL REPO a Star! ⭐️</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-bs-level="1"><a href="#conclusion" class="nav-link">Conclusion</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="cache-augmented-generation-cag-in-llms-a-step-by-step-tutorial">Cache-Augmented Generation (CAG) in LLMs: A Step-by-Step Tutorial</h1>
+<p><img alt="" src="https://medium.com/plans?dimension=post_audio_button&amp;postId=6ac35d415eec&amp;source=upgrade_membership---post_audio_button----------------------------------" /></p>
+<p><img alt="" src="https://miro.medium.com/v2/resize:fit:1050/1*DIzPQYzWxlGo0RXNpAtH5g.png" /></p>
+<p>Retrieval-augmented generation (RAG) is a powerful method to connect external knowledge bases to an LLM and fetch context each time a user asks a question, but it can slow down the LLM’s performance due to its retrieval latency.</p>
+<p>Cache-augmented generation (CAG) offers a faster alternative; instead of performing real-time retrieval, it <em>preloads</em> your relevant documents into the model’s context and stores that inference state — also known as a Key-Value (KV) cache. This approach eliminates retrieval latencies, allowing the model to access preloaded information instantly for faster and more efficient responses.</p>
+<p>For a more technical explanation of CAG, check out <a href="https://medium.com/@sahin.samia/cache-augmented-generation-a-faster-simpler-alternative-to-rag-for-ai-2d102af395b2">this article</a>.</p>
+<p>In this tutorial, we will show how to build a simple CAG setup to embed all your knowledge upfront, quickly answer multiple user queries, and reset the cache without reloading the entire context each time.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>1. A HuggingFace account and a HuggingFace access token</p>
+<p>2. A document.txt file with sentences about yourself.</p>
+<h2 id="project-setup">Project Setup</h2>
+<p>We import the essential libraries:</p>
+<ul>
+<li><code>torch</code>for PyTorch.</li>
+<li><code>transformers</code> for Hugging Face.</li>
+<li><code>DynamicCache</code> for storing the model’s key-value states.</li>
+</ul>
+<p>import torch<br />
+from transformers import AutoTokenizer, AutoModelForCausalLM<br />
+from transformers.cache_utils import DynamicCache<br />
+import os</p>
+<h2 id="generate-function">Generate Function</h2>
+<p>We’ll next define the <code>generate</code> function.</p>
+<p>The <code>generate</code> function handles token-by-token generation with the cached knowledge using greedy decoding.</p>
+<p>Greedy decoding is a simple text generation method where, at each step, the token with the highest probability (maximum value in the logits) is selected as the next token.</p>
+<p>We pass in these inputs:</p>
+<ul>
+<li><code>model</code>: The LLM, which with me Mistral-7B for this tutorial.</li>
+<li><code>input_ids</code>: A tensor containing the tokenized input sequence.</li>
+<li><code>past_key_values</code>: The core component of the CAG. A cache of previously computed attention values is used to speed up inference by avoiding recomputation.</li>
+<li><code>max_new_tokens</code>: The maximum number of new tokens to generate. The default is 50.</li>
+</ul>
+<p>The function operates in a loop that iterates up to <code>max_new_tokens</code> times or terminates early if an end-of-sequence token (if configured) is generated.</p>
+<p>At each iteration:</p>
+<ul>
+<li>The model processes the current input tokens along with the cached <code>past_key_values</code>, producing logits for the next token.</li>
+<li>The logits are analyzed to identify the token with the highest probability using greedy decoding.</li>
+<li>This new token is appended to the output sequence, and the cache (<code>past_key_values</code>) is updated to include the current context.</li>
+<li>The newly generated token becomes the input for the next iteration.</li>
+</ul>
+<p>def generate(model, input_ids: torch.Tensor, past_key_values, max_new_tokens: int = 50) -&gt; torch.Tensor:<br />
+    device = model.model.embed_tokens.weight.device<br />
+    origin_len = input_ids.shape[-1]<br />
+    input_ids = input_ids.to(device)<br />
+    output_ids = input_ids.clone()<br />
+    next_token = input_ids  </p>
+<pre><code>with torch.no\_grad():  
+    for \_ in range(max\_new\_tokens):  
+        out = model(  
+            input\_ids=next\_token,  
+            past\_key\_values=past\_key\_values,  
+            use\_cache=True  
+        )  
+        logits = out.logits\[:, -1, :\]  
+        token = torch.argmax(logits, dim=-1, keepdim=True)  
+        output\_ids = torch.cat(\[output\_ids, token\], dim=-1)  
+        past\_key\_values = out.past\_key\_values  
+        next\_token = token.to(device)
+
+        if model.config.eos\_token\_id is not None and token.item() == model.config.eos\_token\_id:  
+            break  
+return output\_ids\[:, origin\_len:\]
+</code></pre>
+<h2 id="dynamiccache-setup">DynamicCache Setup</h2>
+<p>Next, we’ll define the <code>get_kv_cache</code> function that prepares a reusable key-value cache for a transformer model’s attention mechanism and the <code>clean_up</code> function that cleans the key-value cache by removing unnecessary entries to ensure that you can answer multiple independent questions without “polluting” the cache.</p>
+<p><code>get_kv_cache</code> passes a prompt (in our case, the knowledge from <code>document.txt</code>) through the model once, creating a KV cache that records all the hidden states from each layer.</p>
+<p><code>get_kv_cache</code> passes in these inputs:</p>
+<ul>
+<li><code>model</code>: The transformer model used for encoding the prompt.</li>
+<li><code>tokenizer</code>: Tokenizer to convert the prompt into token IDs.</li>
+<li><code>prompt</code>: A string input is used as the prompt.</li>
+</ul>
+<p>and returns an object of the type <code>DynamicCache.</code></p>
+<p>The <code>get_kv_cache</code> function first tokenizes the provided prompt using the tokenizer, converts it into input IDs, and then initializes an <code>DynamicCache</code> object to store key-value pairs, and then performs a forward pass through the model with caching enabled (<code>use_cache=True</code>). This populates the cache with the key-value pairs resulting from the model's computation.</p>
+<p>The <code>clean_up</code> trims a <code>DynamicCache</code> object to match the original sequence length by removing any additional tokens added during processing. For each layer of the cache, it slices both the key and value tensors to retain only the first <code>origin_len</code> tokens along the sequence dimension.</p>
+<p>def get_kv_cache(model, tokenizer, prompt: str) -&gt; DynamicCache:<br />
+    device = model.model.embed_tokens.weight.device<br />
+    input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(device)<br />
+    cache = DynamicCache()  </p>
+<pre><code>with torch.no\_grad():  
+    \_ = model(  
+        input\_ids=input\_ids,  
+        past\_key\_values=cache,  
+        use\_cache=True  
+    )  
+return cache
+</code></pre>
+<p>def clean_up(cache: DynamicCache, origin_len: int):<br />
+    for i in range(len(cache.key_cache)):<br />
+        cache.key_cache[i] = cache.key_cache[i][:, :, :origin_len, :]<br />
+        cache.value_cache[i] = cache.value_cache[i][:, :, :origin_len, :]</p>
+<h2 id="load-llm-mistral">Load LLM (Mistral)</h2>
+<p>Now we’ll load the Mistral-7B model, and load the tokenizer and model in full precision or half precision (FP16) on GPU if available.</p>
+<p>Remember to input <code>YOUR_HF_TOKEN</code> with your unique HuggingFace Token.</p>
+<p>model_name = "mistralai/Mistral-7B-Instruct-v0.1"<br />
+tokenizer = AutoTokenizer.from_pretrained(model_name, token="YOUR_HF_TOKEN", trust_remote_code=True)<br />
+model = AutoModelForCausalLM.from_pretrained(<br />
+    model_name,<br />
+    torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,<br />
+    device_map="auto",<br />
+    trust_remote_code=True,<br />
+    token="YOUR_HF_TOKEN"<br />
+)<br />
+device = "cuda" if torch.cuda.is_available() else "cpu"<br />
+model.to(device)<br />
+print(f"Loaded {model_name}.")</p>
+<h2 id="create-a-knowledge-prompt-from-documenttxt">Create a Knowledge Prompt from document.txt</h2>
+<p>Next, we’ll read <code>document.txt</code> , which you can fill with information about yourself. For this tutorial, <code>document.txt</code> contains information about me (Ronan Takizawa).</p>
+<p>Here we construct a simple system prompt embedding with the doc information and pass it to <code>get_kv_cache</code> to generate the KV cache.</p>
+<p>with open("document.txt", "r", encoding="utf-8") as f:<br />
+    doc_text = f.read()  </p>
+<p>system_prompt = f"""<br />
+&lt;|system|&gt;<br />
+You are an assistant who provides concise factual answers.<br />
+&lt;|user|&gt;<br />
+Context:<br />
+{doc_text}<br />
+Question:<br />
+""".strip()  </p>
+<p>ronan_cache = get_kv_cache(model, tokenizer, system_prompt)<br />
+origin_len = ronan_cache.key_cache[0].shape[-2]<br />
+print("KV cache built.")</p>
+<h2 id="ask-questions-reusing-the-cache">Ask Questions Reusing the Cache</h2>
+<p>We first run <code>clean_up</code> to clear our cache (Good practice for CAGs).</p>
+<p>Next, we convert our questions into tokens in <code>input_ids_q1</code> , then appended to the knowledge context stored in <code>ronan_cache</code>.</p>
+<p>Finally, we call <code>generate</code> to produce the answer, decoding the final result with <code>tokenizer.decode</code>.</p>
+<p>question1 = "Who is Ronan Takizawa?"<br />
+clean_up(ronan_cache, origin_len)<br />
+input_ids_q1 = tokenizer(question1 + "\n", return_tensors="pt").input_ids.to(device)<br />
+gen_ids_q1 = generate(model, input_ids_q1, ronan_cache)<br />
+answer1 = tokenizer.decode(gen_ids_q1[0], skip_special_tokens=True)<br />
+print("Q1:", question1)<br />
+print("A1:", answer1)</p>
+<p>You should expect a response like this:</p>
+<p>Q1: Who is Ronan Takizawa?<br />
+A1: Answer: Ronan Takizawa is an ambitious and accomplished <br />
+tech enthusiast. He has a diverse skill set in <br />
+software development, AI/ML...</p>
+<p><a href="https://colab.research.google.com/drive/1-0eKIu6cGAZ47ROKQaF6EU-mHtvJBILV?usp=sharing">Full Code</a></p>
+<h2 id="make-sure-to-leave-the-original-repo-a-star">Make sure to leave the <a href="https://github.com/ronantakizawa/cacheaugmentedgeneration">ORIGINAL REPO</a> a Star! ⭐️</h2>
+<h1 id="conclusion">Conclusion</h1>
+<p>Cache-augmented generation (CAG) simplifies AI architectures by storing small knowledge bases directly within a model’s context window, eliminating the need for retrieval loops in RAG and reducing latency. This approach enhances response speed and improves the responsiveness of an LLM with external knowledge. By leveraging CAG, developers can streamline their AI systems for faster and more efficient knowledge integration, particularly for tasks with stable, compact datasets.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../js/base.js"></script>
+        <script src="../search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

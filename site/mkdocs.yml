@@ -1,0 +1,11 @@
+site_name: My Documentation Site
+
+nav:
+  - Home: index.md
+  - documentation:
+      - Overview: Chapter_1.md
+      - Chapter 1.1: Chapter_1.1.md
+      - Chapter 1.2: Augmented Reality.md
+theme: readthedocs
+
+

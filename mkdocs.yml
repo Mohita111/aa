@@ -1,0 +1,13 @@
+site_name: My Docs Site
+docs_dir: docs  # No need for the full path, just use 'docs'
+nav:
+  - Resources:
+      - Home: index.md
+      - Chapter 1: Chapter_1.md
+      - Chapter 2: Chapter_1.1.md
+      - Augmented Reality: Augmented Reality.md
+theme:
+  name: readthedocs
+
+
+    
