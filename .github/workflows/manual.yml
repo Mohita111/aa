@@ -1,0 +1,7 @@
+on:
+  push:
+    paths:
+      - 'hello.py'  # Trigger only when hello.py changes
+    branches:
+      - main  # Ensure this is your branch
+  workflow_dispatch:  # Allows manual trigger
